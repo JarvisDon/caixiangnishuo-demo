@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>猜你想说 — 项目介绍</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',system-ui,-apple-system,sans-serif;background:#faf9f7;color:#2d2d2d;line-height:1.8;-webkit-font-smoothing:antialiased}
+
+.container{max-width:720px;margin:0 auto;padding:0 24px}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,#2d1f10 0%,#1a1a2e 100%);padding:80px 24px 60px;text-align:center}
+.hero-badge{display:inline-block;padding:4px 16px;border-radius:20px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);font-size:12px;margin-bottom:20px;letter-spacing:1px}
+.hero h1{font-size:42px;font-weight:900;color:#fff;margin-bottom:8px;letter-spacing:2px}
+.hero-slogan{font-size:22px;color:#e8a85c;font-weight:500;margin-bottom:32px}
+.hero-meta{display:flex;justify-content:center;gap:24px;flex-wrap:wrap}
+.hero-meta span{font-size:13px;color:rgba(255,255,255,.5)}
+.hero-meta strong{color:rgba(255,255,255,.8)}
+
+/* Section */
+.section{padding:56px 0}
+.section-num{font-size:12px;color:#c08040;font-weight:700;letter-spacing:2px;margin-bottom:8px}
+.section h2{font-size:26px;font-weight:700;color:#1a1a1a;margin-bottom:20px;line-height:1.4}
+.section p{font-size:15px;color:#555;line-height:2;margin-bottom:16px}
+.section p:last-child{margin-bottom:0}
+
+/* Image card */
+.img-card{margin:28px 0;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);border:1px solid #eee}
+.img-card img{width:100%;display:block}
+.img-card .caption{padding:14px 20px;background:#fff;font-size:13px;color:#888;text-align:center;font-weight:500}
+
+/* Highlight box */
+.highlight{background:linear-gradient(135deg,#fef7ed,#fdf2e4);border:1px solid #f0dcc4;border-radius:14px;padding:20px 24px;margin:24px 0}
+.highlight p{color:#8b6914;font-size:14px;line-height:1.8;margin:0}
+.highlight strong{color:#6b4f10}
+
+/* Feature grid */
+.features{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:28px 0}
+.feature-card{background:#fff;border-radius:14px;padding:20px;border:1px solid #eee;transition:box-shadow .2s}
+.feature-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.feature-icon{font-size:32px;margin-bottom:10px}
+.feature-title{font-size:15px;font-weight:600;color:#2d2d2d;margin-bottom:6px}
+.feature-desc{font-size:13px;color:#666;line-height:1.7}
+
+/* Comparison table */
+.compare{width:100%;border-collapse:separate;border-spacing:0;margin:24px 0;border-radius:12px;overflow:hidden;border:1px solid #eee}
+.compare th{background:#f5f0ea;padding:12px 16px;font-size:13px;font-weight:600;color:#888;text-align:left}
+.compare td{padding:12px 16px;font-size:14px;color:#444;border-top:1px solid #f0ebe4}
+.compare tr:hover td{background:#fef9f2}
+
+/* User card */
+.user-card{background:#fff;border-radius:14px;padding:24px;border:1px solid #eee;margin:20px 0}
+.user-label{font-size:12px;color:#c08040;font-weight:700;margin-bottom:8px;letter-spacing:1px}
+.user-title{font-size:17px;font-weight:600;color:#2d2d2d;margin-bottom:10px}
+.user-desc{font-size:14px;color:#666;line-height:1.8}
+
+/* Demo CTA */
+.cta{text-align:center;padding:48px 0 64px}
+.cta-link{display:inline-block;padding:16px 40px;border-radius:30px;background:linear-gradient(135deg,#c08040,#d4a060);color:#fff;font-size:16px;font-weight:600;text-decoration:none;box-shadow:0 4px 20px rgba(192,128,64,.3);transition:all .2s}
+.cta-link:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(192,128,64,.4)}
+.cta-hint{font-size:12px;color:#aaa;margin-top:12px}
+
+/* Demo features list */
+.demo-features{list-style:none;margin:20px 0;padding:0}
+.demo-features li{padding:10px 0;font-size:14px;color:#555;border-bottom:1px solid #f0ebe4;display:flex;align-items:flex-start;gap:10px}
+.demo-features li:last-child{border-bottom:none}
+.demo-features .dot{width:6px;height:6px;border-radius:50%;background:#c08040;flex-shrink:0;margin-top:9px}
+
+/* Divider */
+.divider{width:40px;height:3px;background:#e8c090;border-radius:2px;margin:0 auto}
+
+/* Footer */
+.footer{text-align:center;padding:32px 24px;font-size:12px;color:#ccc;border-top:1px solid #eee}
+
+/* Responsive */
+@media(max-width:600px){
+  .hero h1{font-size:32px}
+  .hero-slogan{font-size:18px}
+  .features{grid-template-columns:1fr}
+  .section h2{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-badge">AI HACKATHON 4.0 · 脑洞赛道</div>
+  <h1>猜你想说</h1>
+  <div class="hero-slogan">不用猜了，AI懂他</div>
+  <div class="hero-meta">
+    <span>团队：<strong>猜得都队</strong></span>
+    <span>方向：<strong>推荐算法 × 无障碍沟通</strong></span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- 使用场景 -->
+<div class="section">
+  <div class="section-num">使用场景</div>
+  <h2>最让人揪心的"猜"</h2>
+  <p>我爷爷因病卧床，意识非常清楚，但语言功能严重受损，说不出话来。每天家人都在猜——"渴了吗？""疼吗？""想上厕所？"猜了五六轮还没猜对，他从急切变成无奈，我们也感到一阵无力。</p>
+
+  <div class="img-card">
+    <img src="images/pain_point_scene.jpg" alt="痛点场景">
+    <div class="caption">爷爷想表达什么？家人只能一轮轮猜，猜不对双方都很无奈</div>
+  </div>
+
+  <p>这不是我一个人的经历。中国现有脑卒中患者近<strong>1500万</strong>，每年新发约330万，其中约1/3会出现失语或语言障碍。加上渐冻症近10万患者、帕金森超300万患者中晚期的构音障碍人群，"意识清醒但说不出来"的老人有<strong>数百万</strong>，背后的照护家属更是千万级。</p>
+
+  <p>产品使用的典型场景：老人躺在床上或轮椅上，打开平板上的App，看到AI根据当前时间和个人习惯推荐的3个大按钮（图标+文字），点一下就完成表达。家属手机端实时收到消息通知。如果想说更复杂的内容，进入接龙模式，逐步选词拼出完整句子。</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- 面向用户 -->
+<div class="section">
+  <div class="section-num">面向用户</div>
+  <h2>两类用户，一个产品</h2>
+
+  <div class="user-card">
+    <div class="user-label">核心用户</div>
+    <div class="user-title">意识清醒但存在语言/运动功能障碍的老人</div>
+    <div class="user-desc">包括脑卒中失语患者、渐冻症患者、帕金森晚期患者等。可能同时存在手部活动受限、视力下降、注意力难以持久等多重障碍，因此产品交互必须极简——最好一步完成，最多五步。</div>
+  </div>
+
+  <div class="user-card">
+    <div class="user-label">次要用户</div>
+    <div class="user-title">老人的日常照护家属</div>
+    <div class="user-desc">他们是App的实际管理者和消息接收方，也是系统"学习"过程中的反馈来源——确认或纠正AI的猜测，帮助系统越用越懂这个老人。</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 解决需求 -->
+<div class="section">
+  <div class="section-num">解决需求</div>
+  <h2>不是让老人学工具，而是让AI学会理解老人</h2>
+  <p>当前老人与家人沟通完全靠"猜"，效率极低，双方都很痛苦。市面上有辅助沟通工具（AAC设备），但本质是一棵分类词树，让老人在多级菜单里找词——这对高龄卧床老人来说太复杂了，根本用不了。</p>
+
+  <div class="img-card">
+    <img src="images/traditional_aac_device.jpg" alt="传统AAC设备">
+    <div class="caption">传统AAC工具：几十个按钮的分类矩阵，卧床老人根本用不了</div>
+  </div>
+
+  <div class="highlight">
+    <p><strong>核心需求：</strong>让说不出话的老人用最低的交互成本表达自己的想法。不是让老人学会使用复杂工具，而是让AI学会理解这个老人。</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 产品功能 -->
+<div class="section">
+  <div class="section-num">产品功能</div>
+  <h2>快捷模式 + 接龙模式，覆盖所有表达需求</h2>
+
+  <div class="img-card">
+    <img src="images/product_interface_concept.jpg" alt="产品界面">
+    <div class="caption">极简界面：大图标+大文字，不识字也能看懂，一点就发送</div>
+  </div>
+
+  <div class="features">
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">快捷模式（一步达）</div>
+      <div class="feature-desc">屏幕只显示3个图文大按钮，AI根据时间、个人习惯、上下文推荐最可能的表达。早上8点自动把"想喝水"排第一，晚上把"想睡觉"排第一。1次点击完成，覆盖约80%日常需求。</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔗</div>
+      <div class="feature-title">接龙模式（逐词拼句）</div>
+      <div class="feature-desc">像成语接龙一样，每步选一个词，AI根据前面所有选择动态生成下一步候选项。从"我"→"想"→"见"→"孙女"→"周末"，最多5步拼出完整句子。每步只有3-4个选项。</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💬</div>
+      <div class="feature-title">家属端</div>
+      <div class="feature-desc">实时接收消息通知，也可主动发语音给老人（AI将语音转为超大字+图标展示给老人看）。</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚙️</div>
+      <div class="feature-title">管理后台</div>
+      <div class="feature-desc">家属可自定义选项池（如添加"想听京剧"等个人专属表达），查看表达历史趋势。</div>
+    </div>
+  </div>
+
+  <table class="compare">
+    <tr><th></th><th>快捷模式</th><th>接龙模式</th></tr>
+    <tr><td><strong>交互次数</strong></td><td>1次点击</td><td>3-5次点击</td></tr>
+    <tr><td><strong>覆盖场景</strong></td><td>80%高频日常需求</td><td>长尾复杂表达</td></tr>
+    <tr><td><strong>技术类比</strong></td><td>推荐系统热门榜单</td><td>个性化探索推荐</td></tr>
+  </table>
+</div>
+
+<div class="divider"></div>
+
+<!-- 核心亮点 -->
+<div class="section">
+  <div class="section-num">核心亮点</div>
+  <h2>推荐算法驱动，越用越懂</h2>
+
+  <div class="highlight">
+    <p><strong>推荐算法驱动个性化排序</strong> —— 与现有AAC工具的本质区别。传统工具给所有老人同一套菜单，我们的产品每个人看到的选项不同，而且越用越懂。每一步选择建模为推荐排序问题：已选词序列是上下文，下一个候选词是待推荐项，家属的确认或纠正是反馈信号。我们团队本身做推荐算法，架构高度一致。</p>
+  </div>
+
+  <div class="img-card">
+    <img src="images/ai_recommendation.jpg" alt="AI推荐原理">
+    <div class="caption">个性化推荐：同一个界面，不同老人、不同时间看到完全不同的选项</div>
+  </div>
+
+  <div class="features">
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <div class="feature-title">交互成本接近零</div>
+      <div class="feature-desc">快捷模式1次点击，接龙模式最多5次。所有按钮都是大图标+大文字，卧床老人也能操作。</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">❤️</div>
+      <div class="feature-title">真实一手洞察</div>
+      <div class="feature-desc">需求不是想象出来的，是我和家人每天都在经历的事。我爷爷就是我的第一个用户。</div>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p><strong>为什么必须用AI？</strong>每个老人的表达习惯都不同。同一个皱眉，对A意味着头疼，对B意味着想见某个人。静态选项排列无法适应个体差异，只有AI能从历史数据中学到这个老人独有的表达模式。</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Demo -->
+<div class="section">
+  <div class="section-num">初步产品Demo</div>
+  <h2>可交互的Web原型，核心功能已跑通</h2>
+
+  <ul class="demo-features">
+    <li><span class="dot"></span><span><strong>快捷模式</strong>：切换不同用户（爷爷A/B）和时间（早/中/晚），观察AI推荐选项如何动态变化</span></li>
+    <li><span class="dot"></span><span><strong>上下文推荐</strong>：点击"上厕所"后选项自动刷新为"需要帮忙/洗手"，体验淘宝式推荐联动</span></li>
+    <li><span class="dot"></span><span><strong>接龙模式</strong>：从"我"开始逐步选词，每步选项由AI根据上下文动态生成，体验5步拼出完整句子</span></li>
+    <li><span class="dot"></span><span><strong>家属消息栏</strong>：实时展示发送的消息记录</span></li>
+  </ul>
+
+  <p>Demo重点展示推荐算法的个性化效果——不同用户、不同时间看到完全不同的选项排列，体现"越用越懂"的核心差异化。</p>
+</div>
+
+<!-- CTA -->
+<div class="cta">
+  <a class="cta-link" href="index.html">点击体验交互 Demo →</a>
+  <div class="cta-hint">手机打开效果最佳</div>
+</div>
+
+</div>
+
+<div class="footer">
+  猜得都队 · AI Hackathon 4.0 脑洞赛道 · 猜你想说
+</div>
+
+</body>
+</html>

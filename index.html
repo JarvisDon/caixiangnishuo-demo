@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>猜你想说 — 不用猜了，AI懂他</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',system-ui,sans-serif;background:#0f0f1a;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+
+.phone-frame{width:390px;height:844px;background:#000;border-radius:48px;padding:12px;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 2px #333,inset 0 0 0 1px #222;position:relative;overflow:hidden}
+.phone-notch{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:120px;height:28px;background:#000;border-radius:0 0 16px 16px;z-index:100}
+.phone-screen{width:100%;height:100%;background:#faf9f7;border-radius:38px;overflow:hidden;display:flex;flex-direction:column;position:relative}
+
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:14px 28px 6px;font-size:12px;font-weight:600;color:#333;flex-shrink:0}
+
+.app-header{padding:8px 24px 12px;flex-shrink:0}
+.app-title{font-size:22px;font-weight:700;color:#1a1a1a;letter-spacing:.5px}
+.app-subtitle{font-size:12px;color:#b08050;margin-top:2px;font-weight:500}
+
+.greeting-area{padding:4px 24px 16px;flex-shrink:0}
+.greeting-text{font-size:15px;color:#555;font-weight:400;line-height:1.5}
+
+.tab-bar{display:flex;margin:0 20px 12px;background:#f0ebe4;border-radius:14px;padding:3px;flex-shrink:0}
+.tab-btn{flex:1;padding:10px;border-radius:12px;border:none;background:transparent;font-size:13px;font-weight:600;color:#999;cursor:pointer;transition:all .25s;font-family:inherit}
+.tab-btn.active{background:#fff;color:#b07030;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+
+.ai-badge{display:flex;align-items:center;gap:8px;margin:0 20px 14px;padding:10px 14px;background:linear-gradient(135deg,#fef7ed,#fdf2e4);border-radius:12px;border:1px solid #f0dcc4;transition:all .3s}
+.ai-badge.updated{background:linear-gradient(135deg,#fff3e0,#ffe0b2);border-color:#ffcc80}
+.ai-icon{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#d4903c,#e8a85c);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:700;flex-shrink:0}
+.ai-icon.pulse{animation:iconPulse .6s ease}
+.ai-hint{font-size:11px;color:#a07040;line-height:1.5}
+@keyframes iconPulse{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+
+.content-area{flex:1;overflow-y:auto;padding:0 20px 16px}
+
+.quick-cards{display:flex;flex-direction:column;gap:12px}
+.quick-card{display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:18px;cursor:pointer;transition:all .2s;border:none;width:100%;text-align:left;font-family:inherit;position:relative;overflow:hidden}
+.quick-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .2s;background:rgba(255,255,255,.3)}
+.quick-card:active::before{opacity:1}
+.quick-card:active{transform:scale(0.98)}
+.card-icon-wrap{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.card-info{flex:1}
+.card-title{font-size:18px;font-weight:600;color:#2d2d2d}
+.card-desc{font-size:12px;color:#999;margin-top:2px}
+
+.c-water{background:linear-gradient(135deg,#e3f2fd,#bbdefb)}.c-water .card-icon-wrap{background:#90caf9}
+.c-pain{background:linear-gradient(135deg,#fce4ec,#f8bbd0)}.c-pain .card-icon-wrap{background:#f48fb1}
+.c-toilet{background:linear-gradient(135deg,#e8f5e9,#c8e6c9)}.c-toilet .card-icon-wrap{background:#a5d6a7}
+.c-food{background:linear-gradient(135deg,#fff3e0,#ffe0b2)}.c-food .card-icon-wrap{background:#ffcc80}
+.c-med{background:linear-gradient(135deg,#ede7f6,#d1c4e9)}.c-med .card-icon-wrap{background:#b39ddb}
+.c-sleep{background:linear-gradient(135deg,#e8eaf6,#c5cae9)}.c-sleep .card-icon-wrap{background:#9fa8da}
+.c-turn{background:linear-gradient(135deg,#fce4ec,#f8bbd0)}.c-turn .card-icon-wrap{background:#f48fb1}
+.c-light{background:linear-gradient(135deg,#fffde7,#fff9c4)}.c-light .card-icon-wrap{background:#fff176}
+.c-tea{background:linear-gradient(135deg,#efebe9,#d7ccc8)}.c-tea .card-icon-wrap{background:#bcaaa4}
+.c-radio{background:linear-gradient(135deg,#fff8e1,#ffecb3)}.c-radio .card-icon-wrap{background:#ffd54f}
+.c-headache{background:linear-gradient(135deg,#fce4ec,#f8bbd0)}.c-headache .card-icon-wrap{background:#ef9a9a}
+.c-noodle{background:linear-gradient(135deg,#fff3e0,#ffe0b2)}.c-noodle .card-icon-wrap{background:#ffb74d}
+.c-window{background:linear-gradient(135deg,#e0f2f1,#b2dfdb)}.c-window .card-icon-wrap{background:#80cbc4}
+.c-tv{background:linear-gradient(135deg,#ede7f6,#d1c4e9)}.c-tv .card-icon-wrap{background:#b39ddb}
+.c-company{background:linear-gradient(135deg,#e8f5e9,#c8e6c9)}.c-company .card-icon-wrap{background:#a5d6a7}
+
+.c-followup{background:linear-gradient(135deg,#fef9f2,#fdf2e4);border:1px solid #f5e6d3}
+.c-followup .card-icon-wrap{background:#f0dcc4}
+
+.context-hint{display:flex;align-items:center;gap:6px;padding:10px 14px;margin-bottom:10px;background:#fff8f0;border-radius:10px;border:1px solid #f5e6d3}
+.context-hint-text{font-size:12px;color:#a07040}
+.context-hint-tag{font-size:10px;padding:2px 8px;border-radius:8px;background:#e8a85c;color:#fff;font-weight:600;flex-shrink:0}
+
+.back-btn{display:flex;align-items:center;gap:6px;width:100%;padding:10px 0;border:none;background:transparent;color:#c08040;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:6px;transition:opacity .2s}
+.back-btn:hover{opacity:0.7}
+
+.card-enter{animation:slideInCard .4s ease both}
+@keyframes slideInCard{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.card-enter:nth-child(1){animation-delay:0s}
+.card-enter:nth-child(2){animation-delay:0.08s}
+.card-enter:nth-child(3){animation-delay:0.16s}
+
+.more-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:14px;border-radius:14px;border:2px dashed #ddd;background:transparent;color:#aaa;font-size:13px;cursor:pointer;transition:all .2s;margin-top:4px;font-family:inherit}
+.more-btn:hover{border-color:#c08040;color:#c08040;background:#fef8f0}
+
+.chain-header{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:16px}
+.chain-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;transition:all .3s}
+.chain-dot.done{background:#c08040;color:#fff}
+.chain-dot.active{background:#fef3e2;color:#c08040;box-shadow:0 0 0 3px #e8c090}
+.chain-dot.future{background:#eee;color:#ccc}
+.chain-line{width:16px;height:2px;border-radius:1px;transition:all .3s}
+.chain-line.done{background:#c08040}
+.chain-line.future{background:#e5e5e5}
+
+.sentence-display{background:#f8f4ef;border-radius:14px;padding:14px 18px;margin-bottom:16px;min-height:48px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px}
+.sentence-word{background:linear-gradient(135deg,#c08040,#d4944c);color:#fff;padding:5px 14px;border-radius:16px;font-size:16px;font-weight:600;animation:popIn .3s ease}
+.sentence-ph{color:#ccc;font-size:14px}
+@keyframes popIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+
+.chain-options{display:flex;flex-direction:column;gap:10px}
+.chain-card{display:flex;align-items:center;gap:14px;padding:16px 20px;border-radius:16px;background:#fff;border:2px solid #f0ebe4;cursor:pointer;transition:all .2s;width:100%;text-align:left;font-family:inherit}
+.chain-card:hover{border-color:#d4a060;background:#fef9f2}
+.chain-card:active{transform:scale(.97);border-color:#c08040}
+.chain-card .opt-icon{width:44px;height:44px;border-radius:12px;background:#f5f0ea;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.chain-card .opt-text{font-size:18px;font-weight:600;color:#2d2d2d}
+
+.result-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 0;flex:1}
+.result-check{font-size:56px;margin-bottom:16px;animation:bounceIn .5s ease}
+.result-card{background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-radius:20px;padding:24px;text-align:center;width:100%;margin-bottom:20px}
+.result-label{font-size:12px;color:#4caf50;margin-bottom:8px;font-weight:500}
+.result-text{font-size:24px;font-weight:700;color:#2e7d32}
+.reset-btn{padding:14px 48px;border-radius:30px;border:none;background:linear-gradient(135deg,#c08040,#d4a060);color:#fff;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(192,128,64,.3);font-family:inherit}
+.reset-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(192,128,64,.4)}
+@keyframes bounceIn{0%{transform:scale(0)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
+
+.msg-bar{background:#f5f0ea;padding:14px 20px 20px;border-top:1px solid #ebe5df;flex-shrink:0}
+.msg-title{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.msg-dot{width:8px;height:8px;border-radius:50%;background:#4caf50}
+.msg-label{font-size:12px;color:#888;font-weight:500}
+.msg-list{display:flex;flex-direction:column;gap:6px;max-height:100px;overflow-y:auto}
+.msg-item{background:#fff;border-radius:12px;padding:10px 14px;font-size:13px;color:#444;display:flex;align-items:center;gap:8px;box-shadow:0 1px 4px rgba(0,0,0,.04);animation:slideUp .3s ease}
+.msg-item .mi{font-size:16px}
+.msg-item .mt{flex:1;font-weight:500}
+.msg-item .mtm{font-size:11px;color:#bbb}
+.msg-empty{text-align:center;color:#ccc;font-size:13px;padding:10px}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.toast{position:absolute;top:80px;left:50%;transform:translateX(-50%) translateY(-20px);background:rgba(0,0,0,.75);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;transition:all .3s;pointer-events:none;z-index:50;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Floating controls */
+.controls-float{position:absolute;top:60px;right:-170px;display:flex;flex-direction:column;gap:8px;z-index:10}
+.ctrl-btn{padding:10px 16px;border-radius:12px;border:1px solid #444;font-size:13px;cursor:pointer;font-family:inherit;transition:all .2s;color:#aaa;background:#222}
+.ctrl-btn.active{border-color:#c08040;background:#c08040;color:#fff}
+
+/* Intro overlay */
+.intro-overlay{position:absolute;inset:0;background:linear-gradient(135deg,#2d1f10,#1a1a2e);border-radius:38px;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;padding:40px;text-align:center;cursor:pointer;transition:opacity .5s}
+.intro-overlay.hidden{opacity:0;pointer-events:none}
+.intro-logo{font-size:64px;margin-bottom:20px}
+.intro-title{font-size:28px;font-weight:700;color:#fff;margin-bottom:8px;letter-spacing:1px}
+.intro-slogan{font-size:16px;color:#e8a85c;margin-bottom:32px;font-weight:500}
+.intro-desc{font-size:13px;color:rgba(255,255,255,.6);line-height:1.8;margin-bottom:40px}
+.intro-start{padding:14px 48px;border-radius:30px;border:none;background:linear-gradient(135deg,#c08040,#d4a060);color:#fff;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 4px 20px rgba(192,128,64,.4);font-family:inherit;transition:all .2s}
+.intro-start:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(192,128,64,.5)}
+.intro-team{font-size:11px;color:rgba(255,255,255,.3);margin-top:24px}
+</style>
+</head>
+<body>
+
+<div style="position:relative">
+  <div class="phone-frame">
+    <div class="phone-notch"></div>
+    <div class="phone-screen">
+
+      <!-- Intro splash -->
+      <div class="intro-overlay" id="introOverlay" onclick="startApp()">
+        <div class="intro-logo">💬</div>
+        <div class="intro-title">猜你想说</div>
+        <div class="intro-slogan">不用猜了，AI懂他</div>
+        <div class="intro-desc">
+          为卧床老人设计的AI沟通助手<br>
+          推荐算法 × 个性化排序<br>
+          让每一次表达都只需轻轻一点
+        </div>
+        <button class="intro-start">点击体验 Demo →</button>
+        <div class="intro-team">猜得都队 · AI Hackathon 4.0</div>
+      </div>
+
+      <div class="status-bar" id="statusBar" style="display:none">
+        <span id="clock">08:00</span>
+        <span style="display:flex;gap:6px;align-items:center;font-size:11px">
+          <span>信号 ●●●●</span>
+          <span>🔋 96%</span>
+        </span>
+      </div>
+      <div id="appContent" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;display:none"></div>
+      <div class="msg-bar" id="bottomBar" style="display:none"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+  </div>
+
+  <div class="controls-float" id="controlsPanel" style="display:none">
+    <button onclick="setUser('A')" id="btnUserA" class="ctrl-btn active">👴 爷爷A</button>
+    <button onclick="setUser('B')" id="btnUserB" class="ctrl-btn">👴 爷爷B</button>
+    <div style="height:4px"></div>
+    <button onclick="setTime('morning')" id="btnMorning" class="ctrl-btn active">🌅 早上</button>
+    <button onclick="setTime('noon')" id="btnNoon" class="ctrl-btn">☀️ 中午</button>
+    <button onclick="setTime('night')" id="btnNight" class="ctrl-btn">🌙 晚上</button>
+    <div style="height:4px"></div>
+    <div style="font-size:10px;color:#666;padding:0 4px;line-height:1.4">
+      切换用户/时间<br>体验AI个性化推荐
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== Intro =====
+function startApp(){
+  document.getElementById('introOverlay').classList.add('hidden');
+  document.getElementById('statusBar').style.display='flex';
+  document.getElementById('appContent').style.display='flex';
+  document.getElementById('bottomBar').style.display='';
+  document.getElementById('controlsPanel').style.display='flex';
+  render();
+}
+
+// ===== Data =====
+const quickData = {
+  A: {
+    morning: [
+      {icon:"💧",text:"想喝水",hint:"每天早上最常表达",cls:"c-water",key:"water"},
+      {icon:"🚻",text:"上厕所",hint:"生理需求",cls:"c-toilet",key:"toilet"},
+      {icon:"😣",text:"不舒服",hint:"身体不适",cls:"c-pain",key:"pain"}
+    ],
+    noon: [
+      {icon:"🍚",text:"饿了",hint:"午餐时间到了",cls:"c-food",key:"food"},
+      {icon:"💊",text:"吃药",hint:"饭后用药提醒",cls:"c-med",key:"med"},
+      {icon:"💧",text:"想喝水",hint:"补充水分",cls:"c-water",key:"water"}
+    ],
+    night: [
+      {icon:"😴",text:"想睡觉",hint:"晚间休息",cls:"c-sleep",key:"sleep"},
+      {icon:"🛏️",text:"翻身",hint:"卧床护理需求",cls:"c-turn",key:"turn"},
+      {icon:"💡",text:"开灯",hint:"环境调节",cls:"c-light",key:"light"}
+    ]
+  },
+  B: {
+    morning: [
+      {icon:"🍵",text:"想喝茶",hint:"爷爷B的晨间习惯",cls:"c-tea",key:"tea"},
+      {icon:"📻",text:"听收音机",hint:"个人爱好",cls:"c-radio",key:"radio"},
+      {icon:"😣",text:"头疼",hint:"身体不适",cls:"c-headache",key:"headache"}
+    ],
+    noon: [
+      {icon:"🍜",text:"想吃面",hint:"爷爷B的饮食偏好",cls:"c-noodle",key:"noodle"},
+      {icon:"🪟",text:"看窗外",hint:"想看外面风景",cls:"c-window",key:"window"},
+      {icon:"💧",text:"想喝水",hint:"补充水分",cls:"c-water",key:"water"}
+    ],
+    night: [
+      {icon:"📺",text:"看电视",hint:"爷爷B晚间习惯",cls:"c-tv",key:"tv"},
+      {icon:"😴",text:"想睡觉",hint:"晚间休息",cls:"c-sleep",key:"sleep"},
+      {icon:"🤝",text:"有人陪",hint:"情感陪伴需求",cls:"c-company",key:"company"}
+    ]
+  }
+};
+
+const followUpData = {
+  toilet: [
+    {icon:"🤲",text:"需要帮忙",hint:"上厕所后可能需要协助",cls:"c-followup"},
+    {icon:"🧻",text:"擦屁股",hint:"护理需求",cls:"c-followup"},
+    {icon:"🚿",text:"洗手",hint:"如厕后清洁",cls:"c-followup"}
+  ],
+  water: [
+    {icon:"🍵",text:"温水",hint:"温水更健康",cls:"c-followup"},
+    {icon:"🥤",text:"凉水",hint:"想喝凉的",cls:"c-followup"},
+    {icon:"🙅",text:"不渴了",hint:"只是看看",cls:"c-followup"}
+  ],
+  pain: [
+    {icon:"🤕",text:"头疼",hint:"头部不适",cls:"c-followup"},
+    {icon:"💔",text:"胸口闷",hint:"需要关注",cls:"c-followup"},
+    {icon:"🦵",text:"腿疼",hint:"肢体不适",cls:"c-followup"}
+  ],
+  food: [
+    {icon:"🍚",text:"米饭",hint:"主食选择",cls:"c-followup"},
+    {icon:"🍜",text:"面条",hint:"想吃面",cls:"c-followup"},
+    {icon:"🥟",text:"饺子",hint:"换个口味",cls:"c-followup"}
+  ],
+  med: [
+    {icon:"💧",text:"配水吃药",hint:"需要温水送服",cls:"c-followup"},
+    {icon:"❓",text:"哪个药",hint:"不清楚吃哪种",cls:"c-followup"},
+    {icon:"🙅",text:"不想吃",hint:"抗拒吃药",cls:"c-followup"}
+  ],
+  sleep: [
+    {icon:"💤",text:"困了",hint:"真的想睡了",cls:"c-followup"},
+    {icon:"🛏️",text:"被子盖好",hint:"整理被褥",cls:"c-followup"},
+    {icon:"🙅",text:"睡不着",hint:"辗转难眠",cls:"c-followup"}
+  ],
+  turn: [
+    {icon:"⬅️",text:"往左翻",hint:"向左翻身",cls:"c-followup"},
+    {icon:"➡️",text:"往右翻",hint:"向右翻身",cls:"c-followup"},
+    {icon:"🤲",text:"帮忙扶一下",hint:"需要辅助",cls:"c-followup"}
+  ],
+  light: [
+    {icon:"☀️",text:"太亮了",hint:"灯光调节",cls:"c-followup"},
+    {icon:"🌑",text:"太暗了",hint:"看不清",cls:"c-followup"},
+    {icon:"📴",text:"关灯",hint:"想休息",cls:"c-followup"}
+  ],
+  tea: [
+    {icon:"🟢",text:"绿茶",hint:"爷爷B最爱",cls:"c-followup"},
+    {icon:"🔴",text:"红茶",hint:"换个口味",cls:"c-followup"},
+    {icon:"🍵",text:"烫一点",hint:"喜欢喝热的",cls:"c-followup"}
+  ],
+  radio: [
+    {icon:"📰",text:"新闻台",hint:"听新闻",cls:"c-followup"},
+    {icon:"🎵",text:"戏曲台",hint:"爱听戏",cls:"c-followup"},
+    {icon:"🔊",text:"大声点",hint:"听不清",cls:"c-followup"}
+  ],
+  headache: [
+    {icon:"💊",text:"吃止疼药",hint:"缓解疼痛",cls:"c-followup"},
+    {icon:"😴",text:"想躺一会儿",hint:"休息缓解",cls:"c-followup"},
+    {icon:"👨‍⚕️",text:"叫医生",hint:"需要就医",cls:"c-followup"}
+  ],
+  noodle: [
+    {icon:"🍲",text:"汤面",hint:"热汤面",cls:"c-followup"},
+    {icon:"🍝",text:"干拌面",hint:"不想喝汤",cls:"c-followup"},
+    {icon:"🥚",text:"加个蛋",hint:"营养搭配",cls:"c-followup"}
+  ],
+  window: [
+    {icon:"🌳",text:"看树",hint:"想看绿色",cls:"c-followup"},
+    {icon:"☁️",text:"看天气",hint:"关心外面怎样",cls:"c-followup"},
+    {icon:"🪟",text:"开窗户",hint:"想透气",cls:"c-followup"}
+  ],
+  tv: [
+    {icon:"📺",text:"换台",hint:"不想看这个",cls:"c-followup"},
+    {icon:"🔊",text:"大声点",hint:"听不清",cls:"c-followup"},
+    {icon:"📴",text:"关掉",hint:"不想看了",cls:"c-followup"}
+  ],
+  company: [
+    {icon:"👦",text:"叫儿子来",hint:"想见儿子",cls:"c-followup"},
+    {icon:"👧",text:"孙女呢",hint:"想见孙女",cls:"c-followup"},
+    {icon:"🤝",text:"握握手",hint:"需要肢体安慰",cls:"c-followup"}
+  ]
+};
+
+const contextHints = {
+  toilet:"选了「上厕所」→ AI推测可能需要后续护理",
+  water:"选了「想喝水」→ AI推荐水温偏好",
+  pain:"选了「不舒服」→ AI帮你定位哪里不舒服",
+  food:"选了「饿了」→ AI推荐饮食偏好",
+  med:"选了「吃药」→ AI协助用药流程",
+  sleep:"选了「想睡觉」→ AI推荐睡前需求",
+  turn:"选了「翻身」→ AI推荐翻身方向",
+  light:"选了「开灯」→ AI推荐灯光调节",
+  tea:"选了「想喝茶」→ AI推荐茶叶偏好",
+  radio:"选了「听收音机」→ AI推荐频道",
+  headache:"选了「头疼」→ AI推荐缓解方式",
+  noodle:"选了「想吃面」→ AI推荐面条类型",
+  window:"选了「看窗外」→ AI推荐更多活动",
+  tv:"选了「看电视」→ AI推荐操作",
+  company:"选了「有人陪」→ AI推荐想见谁"
+};
+
+// ===== Dynamic chain: each step's options depend on previous selections =====
+function getChainOptions(selTexts) {
+  const step = selTexts.length;
+  if (step === 0) {
+    return [
+      {icon:"👤",text:"我",hint:""},
+      {icon:"👦",text:"你",hint:"对家属说"},
+      {icon:"👉",text:"叫",hint:"叫某人过来"}
+    ];
+  }
+  const last = selTexts[step - 1];
+  if (step === 1) {
+    if (last === "我") return [
+      {icon:"🤔",text:"想",hint:"表达意愿"},
+      {icon:"🙅",text:"不想",hint:"拒绝某事"},
+      {icon:"😣",text:"不舒服",hint:"身体不适"}
+    ];
+    if (last === "你") return [
+      {icon:"👋",text:"过来",hint:"让家属过来"},
+      {icon:"🙏",text:"帮我",hint:"需要帮助"},
+      {icon:"👍",text:"真好",hint:"表达感谢"}
+    ];
+    if (last === "叫") return [
+      {icon:"👦",text:"儿子",hint:""},
+      {icon:"👧",text:"孙女",hint:""},
+      {icon:"👨‍⚕️",text:"医生",hint:""},
+      {icon:"👫",text:"老伴",hint:""}
+    ];
+  }
+  if (step === 2) {
+    if (last === "想") return [
+      {icon:"👀",text:"见",hint:"想见某人"},
+      {icon:"🥤",text:"喝",hint:"想喝东西"},
+      {icon:"🍚",text:"吃",hint:"想吃东西"},
+      {icon:"🚶",text:"去",hint:"想去某处"}
+    ];
+    if (last === "不想") return [
+      {icon:"💊",text:"吃药",hint:"不想吃药"},
+      {icon:"🛏️",text:"翻身",hint:"不想翻身"},
+      {icon:"😴",text:"睡觉",hint:"不想睡"},
+      {icon:"💉",text:"打针",hint:"不想打针"}
+    ];
+    if (last === "不舒服") return [
+      {icon:"🤕",text:"头疼",hint:""},
+      {icon:"💔",text:"胸口闷",hint:""},
+      {icon:"🦵",text:"腿疼",hint:""},
+      {icon:"🤢",text:"恶心",hint:""}
+    ];
+    if (last === "过来" || last === "帮我") return [
+      {icon:"💧",text:"倒杯水",hint:""},
+      {icon:"🛏️",text:"扶我一下",hint:""},
+      {icon:"🪟",text:"开窗",hint:""},
+      {icon:"💡",text:"开灯",hint:""}
+    ];
+    if (last === "真好" || last === "儿子" || last === "孙女" || last === "医生" || last === "老伴") {
+      return null; // sentence is complete
+    }
+  }
+  if (step === 3) {
+    if (last === "见") return [
+      {icon:"👧",text:"孙女",hint:""},
+      {icon:"👦",text:"儿子",hint:""},
+      {icon:"👫",text:"老伴",hint:""},
+      {icon:"👨‍⚕️",text:"医生",hint:""}
+    ];
+    if (last === "喝") return [
+      {icon:"💧",text:"水",hint:""},
+      {icon:"🍵",text:"茶",hint:""},
+      {icon:"🥛",text:"牛奶",hint:""},
+      {icon:"🧃",text:"果汁",hint:""}
+    ];
+    if (last === "吃") return [
+      {icon:"🍜",text:"面条",hint:""},
+      {icon:"🍚",text:"米饭",hint:""},
+      {icon:"🥟",text:"饺子",hint:""},
+      {icon:"🥚",text:"鸡蛋",hint:""}
+    ];
+    if (last === "去") return [
+      {icon:"🚻",text:"厕所",hint:""},
+      {icon:"🛋️",text:"客厅",hint:""},
+      {icon:"🏥",text:"医院",hint:""}
+    ];
+    // 不想 + something / 不舒服 + something → sentence complete
+    return null;
+  }
+  if (step === 4) {
+    return [
+      {icon:"⏰",text:"现在",hint:""},
+      {icon:"📅",text:"周末",hint:""},
+      {icon:"☀️",text:"今天",hint:""},
+      {icon:"🌙",text:"明天",hint:""}
+    ];
+  }
+  return null; // max depth reached
+}
+
+function chainToText(selTexts) {
+  if (selTexts.length <= 1) return selTexts.join("");
+  // Add comma before the last word if sentence is 5+ words (natural Chinese pause)
+  if (selTexts.length >= 5) {
+    return selTexts.slice(0, -1).join("") + "，" + selTexts[selTexts.length - 1];
+  }
+  return selTexts.join("");
+}
+
+const clocks={morning:"08:00",noon:"12:00",night:"21:00"};
+const timeIcons={morning:"🌅",noon:"☀️",night:"🌙"};
+const greetings={
+  morning:n=>`早上好，${n}。今天感觉怎么样？`,
+  noon:n=>`中午了，${n}。需要点什么？`,
+  night:n=>`晚上了，${n}。有什么需要的吗？`
+};
+
+let S={user:"A",time:"morning",mode:"quick",messages:[],chainSel:[],result:null,ctxStep:0,lastKey:null,prevText:""};
+function userName(){return S.user==="A"?"爷爷":"爷爷B"}
+
+function setUser(u){
+  S.user=u;S.ctxStep=0;S.lastKey=null;S.prevText="";
+  document.getElementById("btnUserA").className="ctrl-btn"+(u==="A"?" active":"");
+  document.getElementById("btnUserB").className="ctrl-btn"+(u==="B"?" active":"");
+  render();
+}
+function setTime(t){
+  S.time=t;S.ctxStep=0;S.lastKey=null;S.prevText="";
+  ["morning","noon","night"].forEach(k=>{
+    document.getElementById("btn"+k.charAt(0).toUpperCase()+k.slice(1)).className="ctrl-btn"+(t===k?" active":"");
+  });
+  document.getElementById("clock").textContent=clocks[t];
+  render();
+}
+function setMode(m){
+  S.mode=m;S.ctxStep=0;S.lastKey=null;S.prevText="";
+  if(m==="chain"){S.chainSel=[];S.result=null}
+  render();
+}
+function goBack(){S.ctxStep=0;S.lastKey=null;S.prevText="";render()}
+function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1500)}
+
+function sendQuick(item,key){
+  const name=userName();
+  const fullText=S.prevText?S.prevText+"，"+item.text:item.text;
+  S.messages.unshift({icon:item.icon,text:name+"："+fullText,time:clocks[S.time]});
+  showToast("✅ 已发送给家属："+item.text);
+  if(S.ctxStep===0&&followUpData[key]){
+    S.ctxStep=1;S.lastKey=key;S.prevText=fullText;
+  } else {
+    S.ctxStep=0;S.lastKey=null;S.prevText="";
+  }
+  render();renderMessages();
+}
+
+function pickChain(idx){
+  const opts = getChainOptions(S.chainSel);
+  if (!opts) return;
+  S.chainSel.push(opts[idx].text);
+  const nextOpts = getChainOptions(S.chainSel);
+  if (!nextOpts) {
+    const s = chainToText(S.chainSel);
+    S.result = s;
+    S.messages.unshift({icon:"💬",text:userName()+"："+s,time:clocks[S.time]});
+    showToast("✅ 已发送："+s);renderMessages();
+  }
+  render();
+}
+function resetChain(){S.chainSel=[];S.result=null;render()}
+
+function renderMessages(){
+  const el=document.getElementById("bottomBar");
+  let h='<div class="msg-title"><div class="msg-dot"></div><span class="msg-label">家属收到的消息</span></div>';
+  if(S.messages.length===0){h+='<div class="msg-empty">点击按钮发送消息</div>'}
+  else{h+='<div class="msg-list">';S.messages.slice(0,3).forEach(m=>{h+='<div class="msg-item"><span class="mi">'+m.icon+'</span><span class="mt">'+m.text+'</span><span class="mtm">'+m.time+'</span></div>'});h+='</div>'}
+  el.innerHTML=h;
+}
+
+function render(){
+  const c=document.getElementById("appContent");
+  const name=userName();
+  let aiBadgeHtml,aiBadgeClass="ai-badge",aiIconClass="ai-icon";
+  if(S.mode==="quick"&&S.ctxStep>0){
+    aiBadgeClass+=" updated";aiIconClass+=" pulse";
+    const hint=contextHints[S.lastKey]||"AI正在根据上下文更新推荐";
+    aiBadgeHtml=`<div class="${aiBadgeClass}"><div class="${aiIconClass}">AI</div><div class="ai-hint">${hint}</div></div>`;
+  } else {
+    aiBadgeHtml=`<div class="${aiBadgeClass}"><div class="${aiIconClass}">AI</div><div class="ai-hint">已根据${name}的习惯和当前时间，智能推荐最可能的表达</div></div>`;
+  }
+  let h=`
+    <div class="app-header"><div class="app-title">猜你想说</div><div class="app-subtitle">不用猜了，AI懂他</div></div>
+    <div class="greeting-area"><div class="greeting-text">${timeIcons[S.time]} ${greetings[S.time](name)}</div></div>
+    <div class="tab-bar">
+      <button class="tab-btn ${S.mode==="quick"?"active":""}" onclick="setMode('quick')">⚡ 快捷模式</button>
+      <button class="tab-btn ${S.mode==="chain"?"active":""}" onclick="setMode('chain')">🔗 接龙模式</button>
+    </div>${aiBadgeHtml}`;
+
+  if(S.mode==="quick"){
+    h+='<div class="content-area">';
+    if(S.ctxStep>0){
+      h+=`<button class="back-btn" onclick="goBack()">← 重新选择</button>`;
+      const hint=contextHints[S.lastKey];
+      if(hint)h+=`<div class="context-hint"><span class="context-hint-tag">AI推荐</span><span class="context-hint-text">${hint}</span></div>`;
+    }
+    let opts,dataSource;
+    if(S.ctxStep===0){opts=quickData[S.user][S.time];dataSource=`quickData['${S.user}']['${S.time}']`}
+    else{opts=followUpData[S.lastKey]||quickData[S.user][S.time];dataSource=followUpData[S.lastKey]?`followUpData['${S.lastKey}']`:`quickData['${S.user}']['${S.time}']`}
+    h+='<div class="quick-cards">';
+    opts.forEach((item,i)=>{
+      const key=item.key||S.lastKey||"";
+      const enterCls=S.ctxStep>0?"card-enter":"";
+      h+=`<button class="quick-card ${item.cls} ${enterCls}" onclick="sendQuick(${dataSource}[${i}],'${key}')">
+        <div class="card-icon-wrap">${item.icon}</div>
+        <div class="card-info"><div class="card-title">${item.text}</div><div class="card-desc">${item.hint}</div></div>
+      </button>`;
+    });
+    h+='</div>';
+    h+=`<button class="more-btn" onclick="setMode('chain')">以上都不是？试试接龙模式 →</button>`;
+    h+='</div>';
+  } else {
+    // ===== Chain mode =====
+    h+='<div class="content-area">';
+    const opts = S.result ? null : getChainOptions(S.chainSel);
+
+    if(S.result){
+      h+=`<div class="result-screen">
+        <div class="result-check">✅</div>
+        <div class="result-card"><div class="result-label">已发送给家属</div><div class="result-text">${S.result}</div></div>
+        <button class="reset-btn" onclick="resetChain()">再说一句</button>
+      </div>`;
+    } else {
+      // Sentence display
+      if(S.chainSel.length>0){
+        h+='<div class="sentence-display">';
+        S.chainSel.forEach(t=>{h+=`<span class="sentence-word">${t}</span>`});
+        h+='</div>';
+      } else {
+        h+='<div class="sentence-display"><span class="sentence-ph">逐步选词，拼出想说的话</span></div>';
+      }
+
+      // Progress dots (dynamic, based on current path)
+      const maxSteps = 5;
+      h+='<div class="chain-header">';
+      for(let i=0;i<S.chainSel.length;i++){
+        h+=`<div class="chain-dot done">✓</div>`;
+        h+=`<div class="chain-line done"></div>`;
+      }
+      if(opts){
+        h+=`<div class="chain-dot active">${S.chainSel.length+1}</div>`;
+      }
+      h+='</div>';
+
+      // Current options (context-aware!)
+      if(opts){
+        h+='<div class="chain-options">';
+        opts.forEach((opt,i)=>{
+          h+=`<button class="chain-card card-enter" onclick="pickChain(${i})">
+            <div class="opt-icon">${opt.icon}</div>
+            <div class="opt-text">${opt.text}</div>
+            ${opt.hint?`<div style="font-size:11px;color:#999;margin-left:auto">${opt.hint}</div>`:""}
+          </button>`;
+        });
+        h+='</div>';
+      }
+    }
+    h+='</div>';
+  }
+  c.innerHTML=h;renderMessages();
+}
+</script>
+</body>
+</html>
